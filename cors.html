@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple CORS + CRUD Frontend</title>
+</head>
+<body>
+  <h1>CORS + CRUD Demo</h1>
+
+  <h2>Read All Items</h2>
+  <button onclick="getAllItems()">GET /data</button>
+  <ul id="itemList"></ul>
+
+  <h2>Create Item</h2>
+  <input type="text" id="createName" placeholder="Enter name">
+  <button onclick="createItem()">POST /data</button>
+
+  <h2>Update Item</h2>
+  <input type="number" id="updateId" placeholder="ID to update">
+  <input type="text" id="updateName" placeholder="New name">
+  <button onclick="updateItem()">PUT /data/:id</button>
+
+  <h2>Delete Item</h2>
+  <input type="number" id="deleteId" placeholder="ID to delete">
+  <button onclick="deleteItem()">DELETE /data/:id</button>
+
+  <script>
+    const API = 'http://localhost:5000/data';
+
+    async function getAllItems() {
+      const res = await fetch(API);
+      const data = await res.json();
+      const list = document.getElementById('itemList');
+      list.innerHTML = '';
+      data.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `ID: ${item.id} | Name: ${item.name}`;
+        list.appendChild(li);
+      });
+    }
+
+    async function createItem() {
+      const name = document.getElementById('createName').value;
+      await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+      getAllItems();
+    }
+
+    async function updateItem() {
+      const id = document.getElementById('updateId').value;
+      const name = document.getElementById('updateName').value;
+      await fetch(`${API}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+      getAllItems();
+    }
+
+    async function deleteItem() {
+      const id = document.getElementById('deleteId').value;
+      await fetch(`${API}/${id}`, {
+        method: 'DELETE'
+      });
+      getAllItems();
+    }
+  </script>
+</body>
+</html>
